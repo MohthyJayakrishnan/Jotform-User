@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         SF_USERNAME = 'cpgvaluechain2025@gmail.com'
-        SF_CLIENT_ID = 's3MVG9kb26yEQGZW2LFMSXmeG_Vt16kYneIG.8IL_HqbPfkzvsrWIIZiEXoKUqac95EVCdCwQZYJBeaQQjSI9p'
+        SF_CLIENT_ID = '3MVG9kb26yEQGZW2LFMSXmeG_Vt16kYneIG.8IL_HqbPfkzvsrWIIZiEXoKUqac95EVCdCwQZYJBeaQQjSI9p'
     }
 
     stages {
@@ -16,21 +16,20 @@ pipeline {
 
         stage('Authenticate Salesforce') {
             steps {
-                withCredentials([file(credentialsId: '9e7ff4d9-1675-433d-a8df-411cd7b0f6d8', variable: 'JWT_KEY')]) {
-                    sh '''
-                    sfdx auth:jwt:grant \
-                    --clientid $SF_CLIENT_ID \
-                    --jwtkeyfile $JWT_KEY \
-                    --username $SF_USERNAME \
-                    --instanceurl https://login.salesforce.com
-                    '''
-                }
+                bat """
+                "C:\\Program Files\\sf\\bin\\sf.cmd" org login jwt ^
+                --client-id %SF_CLIENT_ID% ^
+                --jwt-key-file C:\\salesforce-jwt\\server.key ^
+                --username %SF_USERNAME% ^
+                --instance-url https://login.salesforce.com ^
+                --alias cpgvalue
+                """
             }
         }
 
         stage('Deploy to Salesforce') {
             steps {
-                sh 'sfdx force:source:deploy -p force-app'
+                bat '"C:\\Program Files\\sf\\bin\\sf.cmd" project deploy start --source-dir force-app --target-org cpgvalue'
             }
         }
 
